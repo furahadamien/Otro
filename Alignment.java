@@ -1,17 +1,19 @@
 import java.util.*;
 import java.io.*;
-
-public class Alignmnet {
+/**
+ * @author Furaha Damien
+ */
+public class Alignment {
 
     public List<String> sequencesList;
     public int[][] scores;
-    public List<List<Integer>> sortedScores;
+    public List<List<ScoreSource>> sortedScores;
     public String sequences;
 
     public Alignment(String sequences){
         this.sequences = sequences;
         this.sequencesList = new ArrayList<String>();
-        this.sortedScores = new ArrayList<List<Integer>>();
+        this.sortedScores = new ArrayList<List<ScoreSource>>();
     }
 
     /**
@@ -37,13 +39,41 @@ public class Alignmnet {
                 }
             }
             this.sequencesList.add(sb.toString());
-            this.sequencesListremove(0);
+            this.sequencesList.remove(0);
 
         }
         catch(FileNotFoundException e){
             System.out.println("no file found");
         }
     }
-    
 
+    public void pairwiseAligner(){
+        ScoreScheme scheme = new ScoreScheme(2, -1, -2);
+
+        for(int i = 0; i < this.sequencesList.size(); i++){
+            List<ScoreSource> currentSequenceScore = new ArrayList<ScoreSource>();
+            for(int j = 0; j < this.sequencesList.size(); j++){
+                PairWiseAligner alignment = new PairWiseAligner(sequencesList.get(i), sequencesList.get(j), scheme);
+                alignment.runAnalysis();
+                alignment.traceback();
+                int score = alignment.alignmentScore;
+                ScoreSource currObj = new ScoreSource(score, j);
+                currentSequenceScore.add(currObj);
+            }
+            Collections.sort(currentSequenceScore, getCompByScore());
+            this.sortedScores.add(currentSequenceScore );
+        }
+
+    }
+
+    public static Comparator<ScoreSource> getCompByScore(){   
+        Comparator comp = new Comparator<ScoreSource>(){
+            @Override
+            public int compare(ScoreSource s1, ScoreSource s2)  {
+            return s1.compareTo(s2);
+            }        
+        };
+        return comp;
+    }  
+    
 }
