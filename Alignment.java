@@ -40,19 +40,24 @@ public class Alignment {
             }
             this.sequencesList.add(sb.toString());
             this.sequencesList.remove(0);
+            
 
         }
         catch(FileNotFoundException e){
             System.out.println("no file found");
         }
     }
-
+    /**
+     * alignment of each of the pairs using Needlemann-Wusnch
+     * obtains and sorts the highest scoring sequences for each sequence
+     */
     public void pairwiseAligner(){
         ScoreScheme scheme = new ScoreScheme(2, -1, -2);
 
         for(int i = 0; i < this.sequencesList.size(); i++){
             List<ScoreSource> currentSequenceScore = new ArrayList<ScoreSource>();
             for(int j = 0; j < this.sequencesList.size(); j++){
+                if(i == j) continue;
                 PairWiseAligner alignment = new PairWiseAligner(sequencesList.get(i), sequencesList.get(j), scheme);
                 alignment.runAnalysis();
                 alignment.traceback();
@@ -65,15 +70,33 @@ public class Alignment {
         }
 
     }
-
+    /**
+     * compares scores of each of the pairwise alignment
+     * @return 1 or -1 or 0
+     */
     public static Comparator<ScoreSource> getCompByScore(){   
         Comparator comp = new Comparator<ScoreSource>(){
             @Override
             public int compare(ScoreSource s1, ScoreSource s2)  {
-            return s1.compareTo(s2);
+            return s2.compareTo(s1);
             }        
         };
         return comp;
     }  
+
+    public static void main(String [] args){
+
+        Alignment align = new Alignment("sequences.fa");
+        align.parseSequences();
+        align.pairwiseAligner();
+
+        for(List<ScoreSource> list : align.sortedScores){
+            for(ScoreSource s : list){
+                System.out.print(s.scoreSource+1 + " ");
+            }
+            System.out.println();
+        }
+    }
     
 }
+
