@@ -1,7 +1,8 @@
 import java.util.*;
+import java.io.*;
 
 /**@author Furaha Damien
- * most of the code in this class was adopted from user najm-sheikh's
+ * some of the code in this file was adopted from user najm-sheikh's
  * question on codereview.stackexchange on Needlemann-Wusnch optimization
  */
 public class PairWiseAligner {
@@ -89,7 +90,7 @@ public class PairWiseAligner {
         return curr;
     }
 
-    public void traceback() {
+    public void traceback() throws RuntimeException{
         Node curr = matrix[seq_1.length()-1][seq_2.length()-1];
 
         curr = traceHelper(curr);
@@ -106,21 +107,8 @@ public class PairWiseAligner {
         System.out.println(top);
         System.out.println(buffer);
         System.out.println(bottom);
-    }
 
-
-    public static void main(String[] args) {
-
-        String seq_1 = "CATTAATTACACTCTCGCACTCACCACCAAACATCCTAAACCCAGACAGGCCTCGACTCC";
-        String seq_2 = "ACTAAACAAGACTCGCCTGTCTAACTAGGGAGTTTATAATGAACCGTGGCGTAGACCA";
-
-        ScoreScheme s = new ScoreScheme(2, -1, -2);
-        PairWiseAligner dna = new PairWiseAligner(seq_1, seq_2, s);     
-
-       dna.runAnalysis();
-
-        dna.traceback();
-        System.out.println("The alignment score is " + dna.alignmentScore);
+       
 
     }
 }

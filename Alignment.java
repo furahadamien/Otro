@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.lang.Object;
 /**
  * @author Furaha Damien
  */
@@ -53,6 +54,8 @@ public class Alignment {
      */
     public void pairwiseAligner(){
         ScoreScheme scheme = new ScoreScheme(2, -1, -2);
+        System.out.println(this.sequencesList.get(0).length() + "\n");
+        StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < this.sequencesList.size(); i++){
             List<ScoreSource> currentSequenceScore = new ArrayList<ScoreSource>();
@@ -61,12 +64,22 @@ public class Alignment {
                 PairWiseAligner alignment = new PairWiseAligner(sequencesList.get(i), sequencesList.get(j), scheme);
                 alignment.runAnalysis();
                 alignment.traceback();
+                sb.append(alignment.top + "\n");
+                sb.append(alignment.buffer+ "\n");
+                sb.append(alignment.bottom + "\n");
                 int score = alignment.alignmentScore;
                 ScoreSource currObj = new ScoreSource(score, j);
                 currentSequenceScore.add(currObj);
             }
             Collections.sort(currentSequenceScore, getCompByScore());
             this.sortedScores.add(currentSequenceScore );
+        }
+        try(PrintWriter writer = new PrintWriter(new File("alignment.txt"))) {
+            writer.write(sb.toString());
+
+        }
+        catch (FileNotFoundException e){
+            System.out.println("file not found");
         }
 
     }
@@ -84,9 +97,25 @@ public class Alignment {
         return comp;
     }  
 
+    public void buildAlignment(){
+        List<TreeNode> leaves = new ArrayList<TreeNode>();
+
+        for(String s : this.sequencesList){
+            leaves.add(new TreeNode(new ArrayList<TreeNode>(), s));
+        }
+
+        //TODO : CREATE THE UPGMA CLASS FOR GENERATING PHLYOGENETIC TREE
+
+       // TreeNode upgmaTree = new Upgma(leaves);
+
+
+
+    }
+
     public static void main(String [] args){
 
-        Alignment align = new Alignment("sequences.fa");
+        String path = "../../../Downloads/bb3_release/RV11/BBS11031.tfa";
+        Alignment align = new Alignment(path);
         align.parseSequences();
         align.pairwiseAligner();
 
